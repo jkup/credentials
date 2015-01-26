@@ -3,22 +3,19 @@
 */
 
 var fs = require('fs');
+var home = require('home');
 var mkdirp = require('mkdirp');
 
-module.exports = credentials.getHome = credentials.bootstrap = credentials;
+module.exports = credentials.bootstrap = credentials;
 
 function credentials() {
-    var path = credentials.getHome() + '/.credentials';
+    var path = home() + '/.credentials';
 
     fs.open(path, 'r', function (err, fd) {
         if (err) {
             credentials.bootstrap(path);
         }
     });
-}
-
-credentials.getHome = function() {
-    return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 }
 
 credentials.bootstrap = function(path) {
