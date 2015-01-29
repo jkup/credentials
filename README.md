@@ -17,56 +17,65 @@ var mysql       = require('mysql');
 var credentials = require('credentials');
 
 var connection = mysql.createConnection({
-    host     : credentials.get('mysql', 'hostname'),
-    user     : credentials.get('mysql', 'username'),
-    password : credentials.get('mysql', 'password')
+    host     : credentials.get('myApp.mysql', 'hostname'),
+    user     : credentials.get('myApp.mysql', 'username'),
+    password : credentials.get('myApp.mysql', 'password')
 });
 
 ```
 
 ## The Approach
 
-Currently, my thought is to keep a JSON file that tracks each app and it's appropriate credentials. Something like this:
+The current idea is to keep two JSON files. One that contains all the local credentials, and one that grants individial apps access to specific credentials. Something like this:
 
-```js
-var credentials = {
-    "mysql": {
-        "hostname": "localhost",
-        "username": "root_user",
-        "password": "root_password"
+credentials.json
+```json
+{
+  "mysql" :  {
+    "root" : {
+      "host" : "localhost",
+      "user" : "root",
+      "password" : "rootpassword"
     },
-    "twitter_api": {
-        "app_name": "sample_app",
-        "api_key": "3949jakakjnsdlba",
-        "api_secret": "3u429nsdbnfkjhb"
+    "work_user" : {
+      "host" : "localhost",
+      "user" : "bob",
+      "password" : "bobspassword"
     }
+  },
+  "twitter_api" : {
+    "work" : {
+      "app_name" : "work_app",
+      "api_key": "3949jakakjnsdlba",
+      "api_secret": "3u429nsdbnfkjhb"
+    },
+    "side_project" : {
+      "app_name" : "sample_app",
+      "api_key": "3949jakakjnsdlba",
+      "api_secret": "3u429nsdbnfkjhb"
+    }
+  }
 }
 ```
 
-## An Issue
-
-One issue that was brought up is that there should be some way to namespace each app, otherwise you won't be able to use two different Twitter API keys for example.
-
-## A Possible Solution
-
-One thought I have is to create a separate file, as a key mapping individual apps to the credentials they need. This would look something like this:
-
-```js
-var credential_keys = {
-    "mysql": {
-        "some_side_project": true,
-        "something_im_building": true,
-        "a_work_project": true,
-    },
-    "twitter_api": {
-        "some_work_thing": true
-    },
-    "other_twitter_api": {
-        "some_fun_thing": true
-    }
+credentials_apps.json
+```json
+{
+  "work_app" : {
+    "mysql" : "mysql.work_user",
+    "twitter_api" : "twitter_api.work"
+  },
+  "myApp" : {
+    "mysql" : "mysql.root",
+    "twitter_api" : "twitter_api.side_project"
+  },
+  "another_personal_app": {
+    "mysql" : "mysql.sudo"
+  }
 }
 ```
 
+This allows reusing credentials between apps, while only storing any credential once. The downsides are that it requires two files and increases complexity.
 I'm not super thrilled with this approach, but it's what I'm going with unless someone comes up with something better!
 
 ## Contributing
