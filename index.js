@@ -4,38 +4,23 @@
 
 var fs = require('fs');
 var home = require('home');
-var mkdirp = require('mkdirp');
 
-module.exports = credentials.bootstrap = credentials;
-
-function credentials() {
+exports.get = function(app_name, field) {
     var path = home() + '/.credentials';
 
     fs.open(path, 'r', function (err, fd) {
         if (err) {
-            credentials.bootstrap(path);
+            console.error('Credential files have not been created yet, please see [doc]')
         }
     });
-}
 
-credentials.bootstrap = function(path) {
-    mkdirp(path);
+    var keys = app_name.split('.');
 
-    var key = {
-        "current": "mysql"
-    };
+    var obj = JSON.parse(fs.readFileSync(home() + '/.credentials/credentials_apps.json', 'utf8'));
 
-    var obj = {
-        "mysql": {
-            "username": "Jon"
-        }
-    };
+    var new_keys = obj[keys[0]][keys[1]].split('.');
 
-    fs.writeFile(path + '/CREDENTIAL_KEY', JSON.stringify(key), function(err) {
-        if (err) throw err;
-    });
+    var new_obj = JSON.parse(fs.readFileSync(home() + '/.credentials/credentials.json', 'utf8'));
 
-    fs.writeFile(path + '/CREDENTIAL_OBJ', JSON.stringify(obj), function(err) {
-        if (err) throw err;
-    });
+    return new_obj[new_keys[0]][new_keys[1]][field];
 }

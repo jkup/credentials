@@ -33,12 +33,12 @@ credentials.json
 {
   "mysql" :  {
     "root" : {
-      "host" : "localhost",
+      "hostname" : "localhost",
       "user" : "root",
       "password" : "rootpassword"
     },
     "work_user" : {
-      "host" : "localhost",
+      "hostname" : "localhost",
       "user" : "bob",
       "password" : "bobspassword"
     }
